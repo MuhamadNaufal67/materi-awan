@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan UTS Komputasi Awan</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-50: #E6F1FB; --blue-200: #85B7EB; --blue-600: #185FA5; --blue-800: #0C447C; --blue-900: #042C53;
+  --green-50: #EAF3DE; --green-600: #3B6D11; --green-800: #27500A;
+  --amber-50: #FAEEDA; --amber-600: #854F0B; --amber-800: #633806;
+  --red-50: #FCEBEB; --red-600: #A32D2D; --red-800: #791F1F;
+  --teal-50: #E1F5EE; --teal-600: #0F6E56; --teal-800: #085041;
+}
+
+body { font-family: system-ui, sans-serif; background: #f5f7fa; color: #1a1a1a; }
+
+/* HEADER */
+.top-bar {
+  background: linear-gradient(135deg, #042C53, #185FA5);
+  padding: 24px 20px 20px;
+  color: white;
+}
+.top-bar h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.top-bar p { font-size: 13px; opacity: 0.75; margin-top: 4px; }
+
+/* PROGRESS BAR */
+.progress-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.progress-label { font-size: 12px; color: #64748b; white-space: nowrap; }
+.progress-bar-wrap { flex: 1; min-width: 120px; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #185FA5, #1D9E75); border-radius: 10px; transition: width 0.5s ease; }
+.progress-pct { font-size: 12px; font-weight: 600; color: #185FA5; white-space: nowrap; }
+
+/* NAV */
+.nav-wrap { background: white; border-bottom: 1px solid #e2e8f0; padding: 10px 16px; display: flex; gap: 6px; flex-wrap: wrap; overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+.nav-btn {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1px solid #e2e8f0; background: white; color: #475569; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.nav-btn:hover { background: #f1f5f9; color: #1e293b; }
+.nav-btn.active { background: #185FA5; color: white; border-color: #185FA5; }
+.nav-btn .check { display: none; }
+.nav-btn.done .check { display: inline; color: #22c55e; }
+
+/* CONTENT */
+.content { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+.section { display: none; animation: fadeIn 0.2s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* WEEK HEADER */
+.week-header {
+  background: linear-gradient(135deg, #042C53, #185FA5);
+  color: white; border-radius: 12px; padding: 20px; margin-bottom: 16px;
+}
+.week-header h2 { font-size: 18px; font-weight: 700; }
+.week-header p { font-size: 13px; opacity: 0.75; margin-top: 4px; }
+.week-badge { display: inline-block; background: rgba(255,255,255,0.2); font-size: 11px; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; }
+
+/* CARDS */
+.card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; }
+.card-title { font-size: 14px; font-weight: 600; color: #1e293b; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* BADGES */
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+.badge-red { background: var(--red-50); color: var(--red-600); }
+.badge-blue { background: var(--blue-50); color: var(--blue-600); }
+.badge-green { background: var(--green-50); color: var(--green-600); }
+.badge-amber { background: var(--amber-50); color: var(--amber-600); }
+.badge-teal { background: var(--teal-50); color: var(--teal-600); }
+
+/* HIGHLIGHT BOXES */
+.hl { padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.65; }
+.hl-blue { background: var(--blue-50); border-left: 3px solid #185FA5; color: var(--blue-800); }
+.hl-green { background: var(--green-50); border-left: 3px solid #3B6D11; color: var(--green-800); }
+.hl-amber { background: var(--amber-50); border-left: 3px solid #854F0B; color: var(--amber-800); }
+.hl-teal { background: var(--teal-50); border-left: 3px solid #0F6E56; color: var(--teal-800); }
+.hl-red { background: var(--red-50); border-left: 3px solid #A32D2D; color: var(--red-800); }
+
+/* TABLES */
+.table-wrap { overflow-x: auto; margin: 4px 0 6px; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 400px; }
+th { background: #f8fafc; color: #475569; font-weight: 600; padding: 9px 12px; border: 1px solid #e2e8f0; text-align: left; font-size: 12px; }
+td { padding: 8px 12px; border: 1px solid #e2e8f0; color: #334155; vertical-align: top; line-height: 1.5; }
+tr:hover td { background: #f8fafc; }
+
+/* QUIZ */
+.quiz-q { border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; background: #fafbfd; }
+.q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.q-num { font-size: 11px; color: #94a3b8; font-weight: 500; }
+.diff-easy { background: var(--green-50); color: var(--green-600); font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+.diff-med { background: var(--amber-50); color: var(--amber-600); font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+.diff-hard { background: var(--red-50); color: var(--red-600); font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+
+.q-text { font-size: 13px; color: #1e293b; line-height: 1.6; margin-bottom: 12px; font-weight: 500; }
+
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.ans-btn {
+  padding: 6px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: 12px; font-weight: 500; cursor: pointer; background: white; color: #475569;
+  transition: all 0.15s;
+}
+.ans-btn:hover { background: var(--blue-50); border-color: #185FA5; color: var(--blue-600); }
+.ans-btn.revealed { background: var(--blue-50); border-color: #185FA5; color: var(--blue-600); }
+
+.answer-box {
+  display: none; margin-top: 12px; background: var(--green-50);
+  border-left: 3px solid #3B6D11; color: var(--green-800);
+  padding: 12px 14px; border-radius: 0 8px 8px 0; font-size: 13px; line-height: 1.65;
+}
+.answer-box.show { display: block; animation: fadeIn 0.2s ease; }
+
+/* QUIZ FILTER */
+.quiz-filter { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; transition: all 0.15s;
+}
+.filter-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
+
+/* TIPS GRID */
+.tip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.tip-card { padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; }
+.tip-num { width: 26px; height: 26px; border-radius: 50%; background: #185FA5; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.tip-title { font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+.tip-text { font-size: 12px; color: #64748b; line-height: 1.5; }
+
+/* PRIORITY GRID */
+.priority-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.priority-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; text-align: center; }
+.priority-num { font-size: 28px; font-weight: 800; }
+.priority-label { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+.priority-topic { font-size: 12px; font-weight: 600; color: #1e293b; margin-top: 6px; }
+
+/* SCORE CARD */
+.score-card {
+  background: linear-gradient(135deg, #1D9E75, #185FA5);
+  color: white; border-radius: 12px; padding: 20px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.score-num { font-size: 40px; font-weight: 800; line-height: 1; }
+.score-label { font-size: 13px; opacity: 0.8; }
+.score-detail { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+/* ROADMAP TABLE */
+.roadmap-badge {
+  display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600;
+}
+
+/* UL */
+ul { padding-left: 18px; }
+li { font-size: 13px; color: #334155; line-height: 1.7; margin-bottom: 2px; }
+
+/* OVERVIEW STAT */
+.overview-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.ov-stat { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; text-align: center; }
+.ov-stat-num { font-size: 26px; font-weight: 800; color: #185FA5; }
+.ov-stat-label { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+/* MOBILE */
+@media (max-width: 520px) {
+  .top-bar h1 { font-size: 17px; }
+  .content { padding: 14px 12px 50px; }
+  .card { padding: 14px 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>☁️ Panduan UTS Komputasi Awan</h1>
+  <p>Week 1 – 7 · Ringkasan materi + latihan soal interaktif</p>
+</div>
+
+<div class="progress-header">
+  <span class="progress-label">Progress Belajar</span>
+  <div class="progress-bar-wrap"><div class="progress-fill" id="main-progress" style="width:0%"></div></div>
+  <span class="progress-pct" id="main-pct">0%</span>
+</div>
+
+<div class="nav-wrap">
+  <button class="nav-btn active" onclick="showSection('overview', this)">🗺️ Roadmap</button>
+  <button class="nav-btn" onclick="showSection('w1', this)">W1 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('w2', this)">W2 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('w3', this)">W3 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('w4', this)">W4 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('w5', this)">W5 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('w6', this)">W6 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('w7', this)">W7 <span class="check">✓</span></button>
+  <button class="nav-btn" onclick="showSection('tips', this)">💡 Tips UTS</button>
+</div>
+
+<div class="content">
+
+<!-- ====== OVERVIEW ====== -->
+<div id="overview" class="section active">
+  <div class="week-header">
+    <div class="week-badge">ROADMAP</div>
+    <h2>Panduan Belajar UTS Komputasi Awan</h2>
+    <p>Urutan belajar dari fondasi hingga materi lanjutan — Week 1 sampai Week 7</p>
+  </div>
+
+  <div class="overview-stats">
+    <div class="ov-stat"><div class="ov-stat-num">7</div><div class="ov-stat-label">Week Materi</div></div>
+    <div class="ov-stat"><div class="ov-stat-num">50+</div><div class="ov-stat-label">Soal Latihan</div></div>
+    <div class="ov-stat"><div class="ov-stat-num">3</div><div class="ov-stat-label">Level Kesulitan</div></div>
+    <div class="ov-stat"><div class="ov-stat-num">12h</div><div class="ov-stat-label">Estimasi Belajar</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Urutan Belajar yang Direkomendasikan</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>#</th><th>Topik</th><th>Prioritas</th><th>Estimasi</th></tr>
+        <tr><td>1</td><td>Week 1 — Pengenalan Cloud Computing</td><td><span class="badge badge-red">Wajib</span></td><td>2 jam</td></tr>
+        <tr><td>2</td><td>Week 2 — Model Layanan IaaS, PaaS, SaaS</td><td><span class="badge badge-red">Wajib</span></td><td>3 jam</td></tr>
+        <tr><td>3</td><td>Week 3 — Future Trends Cloud</td><td><span class="badge badge-amber">Penting</span></td><td>2 jam</td></tr>
+        <tr><td>4</td><td>Week 4 — Virtualisasi</td><td><span class="badge badge-red">Wajib</span></td><td>2 jam</td></tr>
+        <tr><td>5</td><td>Week 5 — Arsitektur Awan</td><td><span class="badge badge-amber">Penting</span></td><td>2 jam</td></tr>
+        <tr><td>6</td><td>Week 6 — Infrastruktur Awan</td><td><span class="badge badge-amber">Penting</span></td><td>2 jam</td></tr>
+        <tr><td>7</td><td>Week 7 — Webserver on Cloud</td><td><span class="badge badge-green">Pelengkap</span></td><td>1 jam</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 Keterkaitan Antar Topik</div>
+    <div class="hl hl-blue"><strong>Fondasi (Week 1)</strong> → Definisi, prinsip, dan sejarah cloud adalah dasar dari semua topik berikutnya.</div>
+    <div class="hl hl-teal"><strong>Model Layanan (Week 2)</strong> → Topik TERPENTING UTS. IaaS, PaaS, SaaS adalah pilar cloud computing. Week 3 adalah perluasannya.</div>
+    <div class="hl hl-green"><strong>Virtualisasi (Week 4)</strong> → Teknologi inti yang membuat IaaS bisa bekerja. Pelajari setelah Week 2.</div>
+    <div class="hl hl-amber"><strong>Arsitektur & Infrastruktur (Week 5-6)</strong> → Bagaimana cloud dibangun secara teknis. Butuh pemahaman Week 2 & 4 terlebih dahulu.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 Topik Terpenting untuk UTS <span class="badge badge-red">Paling Sering Keluar</span></div>
+    <div class="priority-grid">
+      <div class="priority-card"><div class="priority-num" style="color:#A32D2D">1</div><div class="priority-label">Prioritas tertinggi</div><div class="priority-topic">IaaS vs PaaS vs SaaS</div></div>
+      <div class="priority-card"><div class="priority-num" style="color:#185FA5">2</div><div class="priority-label">Sangat sering keluar</div><div class="priority-topic">5 Prinsip Cloud</div></div>
+      <div class="priority-card"><div class="priority-num" style="color:#3B6D11">3</div><div class="priority-label">Sering keluar</div><div class="priority-topic">Jenis Virtualisasi</div></div>
+      <div class="priority-card"><div class="priority-num" style="color:#854F0B">4</div><div class="priority-label">Sering keluar</div><div class="priority-topic">Deployment Model</div></div>
+      <div class="priority-card"><div class="priority-num" style="color:#0F6E56">5</div><div class="priority-label">Perlu tahu</div><div class="priority-topic">Future Trends</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== WEEK 1 ====== -->
+<div id="w1" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 1</div>
+    <h2>Pengenalan Komputasi Awan</h2>
+    <p>Fondasi paling dasar yang wajib dikuasai sebelum topik apapun</p>
+  </div>
+  <div class="card">
+    <div class="card-title">📖 Definisi Cloud Computing <span class="badge badge-red">Wajib Hafal</span></div>
+    <div class="hl hl-blue"><strong>Definisi:</strong> Cloud computing adalah paradigma penyediaan sumber daya komputasi (server, storage, database, networking, software) melalui internet, dengan pembayaran sesuai penggunaan (pay-as-you-go), tanpa pengelolaan infrastruktur fisik secara langsung.</div>
+    <p style="font-size:13px;color:#475569;margin-top:8px;">Kata kunci: <strong>internet · on-demand · pay-as-you-go · scalable · elastic</strong></p>
+  </div>
+  <div class="card">
+    <div class="card-title">⚡ 5 Prinsip Cloud Computing (NIST) <span class="badge badge-red">Wajib!</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>#</th><th>Prinsip</th><th>Penjelasan Sederhana</th></tr>
+        <tr><td>1</td><td><strong>On-demand self-service</strong></td><td>Bisa langsung pakai sendiri, tanpa hubungi penyedia</td></tr>
+        <tr><td>2</td><td><strong>Broad network access</strong></td><td>Bisa diakses dari mana saja lewat internet</td></tr>
+        <tr><td>3</td><td><strong>Resource pooling</strong></td><td>Sumber daya dipakai bersama banyak pengguna, tapi terisolasi</td></tr>
+        <tr><td>4</td><td><strong>Rapid elasticity</strong></td><td>Kapasitas bisa naik-turun cepat sesuai kebutuhan</td></tr>
+        <tr><td>5</td><td><strong>Measured service</strong></td><td>Bayar hanya sesuai yang dipakai (seperti listrik)</td></tr>
+      </table>
+    </div>
+    <div class="hl hl-amber" style="margin-top:10px;">💡 Trik hafal: <strong>O-B-R-R-M</strong> = On-demand · Broad · Resource pooling · Rapid · Measured</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏢 Jenis Deployment Cloud <span class="badge badge-blue">Penting</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Jenis</th><th>Siapa yang pakai</th><th>Contoh</th></tr>
+        <tr><td>Public Cloud</td><td>Umum, siapa saja</td><td>AWS, GCP, Azure</td></tr>
+        <tr><td>Private Cloud</td><td>Satu organisasi saja</td><td>Server cloud bank, rumah sakit</td></tr>
+        <tr><td>Hybrid Cloud</td><td>Kombinasi keduanya</td><td>HSBC — data sensitif di private, analitik di public</td></tr>
+        <tr><td>Community Cloud</td><td>Kelompok organisasi sejenis</td><td>Cloud khusus instansi pemerintah</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💡 Analogi Sederhana</div>
+    <div class="hl hl-teal"><strong>Analogi Listrik PLN:</strong> Dulu, pabrik harus punya generator sendiri. Sekarang cukup colok ke PLN dan bayar per bulan sesuai pemakaian. Cloud computing = "PLN untuk komputer". Kamu tidak perlu beli server fisik, cukup "colok ke cloud" dan bayar sesuai yang dipakai.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 1</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w1','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w1','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w1','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w1','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w1"></div>
+  </div>
+</div>
+
+<!-- ====== WEEK 2 ====== -->
+<div id="w2" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 2</div>
+    <h2>Model Layanan Cloud: IaaS, PaaS, SaaS</h2>
+    <p>Topik paling sering keluar di UTS — kuasai ini dengan sangat baik</p>
+  </div>
+  <div class="card">
+    <div class="card-title">⚖️ Perbandingan 3 Model Layanan <span class="badge badge-red">Sangat Wajib!</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Aspek</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+        <tr><td>Kepanjangan</td><td>Infrastructure as a Service</td><td>Platform as a Service</td><td>Software as a Service</td></tr>
+        <tr><td>Yang dikelola user</td><td>OS, Aplikasi, Data, Runtime, Middleware</td><td>Aplikasi, Data</td><td>Tidak ada (hanya pakai)</td></tr>
+        <tr><td>Yang dikelola provider</td><td>Virtualization, Server, Storage, Networking</td><td>Runtime, Middleware, OS, Virtualization, Server, Storage, Networking</td><td>Semuanya</td></tr>
+        <tr><td>Kontrol user</td><td>Tinggi</td><td>Sedang</td><td>Rendah</td></tr>
+        <tr><td>Kemudahan pakai</td><td>Sulit (butuh keahlian teknis)</td><td>Sedang</td><td>Mudah</td></tr>
+        <tr><td>Target pengguna</td><td>System Admin, DevOps</td><td>Developer</td><td>End user biasa</td></tr>
+        <tr><td>Contoh</td><td>AWS EC2, GCP Compute Engine, Azure VMs</td><td>Google App Engine, Heroku, AWS Elastic Beanstalk</td><td>Gmail, Zoom, Google Docs, Dropbox</td></tr>
+        <tr><td>Analogi</td><td>Sewa tanah kosong, bangun sendiri</td><td>Sewa rumah sudah ada dinding & atap, isi sendiri</td><td>Sewa apartemen furnished — langsung tinggal</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Kapan Menggunakan Model Apa?</div>
+    <div class="hl hl-blue"><strong>Gunakan IaaS</strong> → Ketika butuh kontrol penuh atas sistem: konfigurasi server, OS, jaringan. Cocok untuk perusahaan dengan tim IT besar.</div>
+    <div class="hl hl-teal"><strong>Gunakan PaaS</strong> → Ketika hanya fokus pada pengembangan aplikasi. Developer tidak mau pusing urusan server. Cocok untuk startup yang ingin bergerak cepat.</div>
+    <div class="hl hl-green"><strong>Gunakan SaaS</strong> → Ketika hanya butuh aplikasi siap pakai. Tidak ada tim IT. Contoh: perusahaan kecil pakai Gmail dan Zoom.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧠 Rumus Pola Berpikir Model Layanan</div>
+    <div class="hl hl-amber"><strong>Formula:</strong> Semakin TINGGI level layanan (IaaS → PaaS → SaaS) = Semakin SEDIKIT kontrol user + Semakin MUDAH dipakai + Semakin BANYAK yang dikelola provider</div>
+    <div class="hl hl-blue"><strong>Cara ingat tanggung jawab:</strong> Di IaaS, user kelola dari OS ke atas. Di PaaS, user kelola dari Aplikasi ke atas. Di SaaS, user tidak kelola apapun.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 2</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w2','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w2','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w2','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w2','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w2"></div>
+  </div>
+</div>
+
+<!-- ====== WEEK 3 ====== -->
+<div id="w3" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 3</div>
+    <h2>Future Trends on Cloud Computing</h2>
+    <p>8 tren masa depan cloud yang perlu dipahami konsep dan contohnya</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🚀 8 Tren Cloud Masa Depan <span class="badge badge-amber">Penting</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tren</th><th>Definisi Singkat</th><th>Contoh Nyata</th></tr>
+        <tr><td><strong>Multi-Cloud</strong></td><td>Pakai lebih dari 1 provider cloud sekaligus</td><td>AWS untuk app, Azure untuk AI, GCP untuk analitik</td></tr>
+        <tr><td><strong>Hybrid Cloud</strong></td><td>Kombinasi private + public cloud</td><td>HSBC: data nasabah di private, ML di public</td></tr>
+        <tr><td><strong>Edge Computing</strong></td><td>Proses data di dekat sumber, bukan di pusat data jauh</td><td>Kamera CCTV cerdas atur lampu lalu lintas otomatis</td></tr>
+        <tr><td><strong>Serverless Computing</strong></td><td>Developer tidak kelola server; fungsi berjalan saat dipanggil</td><td>AWS Lambda: resize foto otomatis saat upload</td></tr>
+        <tr><td><strong>AI Cloud</strong></td><td>AI & ML diintegrasikan ke layanan cloud</td><td>Netflix: rekomendasi film via Deep Learning di cloud</td></tr>
+        <tr><td><strong>Cloud Security Evolution</strong></td><td>Keamanan cloud terus berkembang (Zero Trust, dll)</td><td>Zero Trust: "Never trust, always verify"</td></tr>
+        <tr><td><strong>Green Cloud</strong></td><td>Kurangi dampak lingkungan dari data center</td><td>Google AI kurangi energi pendingin 40%</td></tr>
+        <tr><td><strong>Quantum Cloud</strong></td><td>Akses komputer kuantum via internet</td><td>IBM Quantum: riset farmasi via quantum di cloud</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚡ Edge Computing vs Cloud Computing</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Aspek</th><th>Cloud Computing</th><th>Edge Computing</th></tr>
+        <tr><td>Lokasi proses</td><td>Pusat data (jauh)</td><td>Dekat sumber data (lokal)</td></tr>
+        <tr><td>Latency</td><td>Lebih tinggi</td><td>Sangat rendah</td></tr>
+        <tr><td>Cocok untuk</td><td>Analitik besar, penyimpanan</td><td>IoT real-time, kecepatan respons tinggi</td></tr>
+        <tr><td>Contoh</td><td>Upload file ke Google Drive</td><td>Kamera pintar, mobil otonom</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 3</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w3','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w3','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w3','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w3','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w3"></div>
+  </div>
+</div>
+
+<!-- ====== WEEK 4 ====== -->
+<div id="w4" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 4</div>
+    <h2>Virtualisasi</h2>
+    <p>Teknologi inti yang membuat cloud computing bisa bekerja</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🖥️ Apa itu Virtualisasi? <span class="badge badge-red">Wajib Paham</span></div>
+    <div class="hl hl-blue"><strong>Definisi akademis:</strong> Virtualisasi adalah teknologi yang memungkinkan satu perangkat keras fisik (hardware) dibagi menjadi beberapa unit komputasi virtual yang terisolasi satu sama lain, menggunakan lapisan perangkat lunak yang disebut Hypervisor.</div>
+    <div class="hl hl-teal"><strong>Analogi:</strong> Bayangkan satu tanah luas (server fisik) dibagi menjadi beberapa apartemen (VM) dengan tembok (isolasi). Tiap penghuni tidak tahu penghuni lain ada. Pengelola gedung = Hypervisor.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📦 Jenis-Jenis Virtualisasi</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Jenis</th><th>Apa yang divirtualisasi</th><th>Contoh</th></tr>
+        <tr><td>Server Virtualization</td><td>Server fisik → beberapa VM</td><td>VMware ESXi, Hyper-V</td></tr>
+        <tr><td>Storage Virtualization</td><td>Banyak storage → tampak satu unit</td><td>AWS S3, RAID</td></tr>
+        <tr><td>Network Virtualization</td><td>Jaringan fisik → Virtual Network</td><td>VLAN, VPC (Virtual Private Cloud)</td></tr>
+        <tr><td>Desktop Virtualization</td><td>Desktop OS berjalan di server</td><td>VDI (Virtual Desktop Infrastructure)</td></tr>
+        <tr><td>Application Virtualization</td><td>App berjalan terisolasi tanpa instalasi</td><td>Docker Container</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚙️ Jenis Hypervisor <span class="badge badge-blue">Sering Keluar</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tipe</th><th>Nama</th><th>Cara Kerja</th><th>Contoh</th></tr>
+        <tr><td><strong>Type 1</strong></td><td>Bare-metal Hypervisor</td><td>Langsung di atas hardware, tanpa OS host</td><td>VMware ESXi, Microsoft Hyper-V, Xen</td></tr>
+        <tr><td><strong>Type 2</strong></td><td>Hosted Hypervisor</td><td>Di atas OS host (terinstall seperti aplikasi biasa)</td><td>VirtualBox, VMware Workstation</td></tr>
+      </table>
+    </div>
+    <div class="hl hl-amber" style="margin-top:10px;"><strong>Cara bedain:</strong> Type 1 = LANGSUNG di hardware (performa lebih baik, dipakai di data center). Type 2 = di ATAS OS (mudah diinstal, dipakai di laptop personal).</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🐳 VM vs Container <span class="badge badge-blue">Sering Dibandingkan</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Aspek</th><th>Virtual Machine (VM)</th><th>Container (Docker)</th></tr>
+        <tr><td>OS</td><td>Tiap VM punya OS sendiri (Guest OS)</td><td>Berbagi OS host, hanya isolasi proses</td></tr>
+        <tr><td>Ukuran</td><td>Besar (GB)</td><td>Kecil (MB)</td></tr>
+        <tr><td>Startup</td><td>Menit</td><td>Detik</td></tr>
+        <tr><td>Isolasi</td><td>Sangat kuat</td><td>Sedang</td></tr>
+        <tr><td>Penggunaan resource</td><td>Lebih boros</td><td>Lebih efisien</td></tr>
+        <tr><td>Teknologi</td><td>Hypervisor</td><td>Container Runtime (Docker Engine)</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 4</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w4','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w4','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w4','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w4','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w4"></div>
+  </div>
+</div>
+
+<!-- ====== WEEK 5 ====== -->
+<div id="w5" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 5</div>
+    <h2>Arsitektur Awan</h2>
+    <p>Bagaimana sistem cloud dirancang dan disusun secara teknis</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🏗️ Komponen Utama Arsitektur Cloud <span class="badge badge-blue">Penting</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Komponen</th><th>Fungsi</th><th>Contoh</th></tr>
+        <tr><td>Front-end</td><td>Antarmuka pengguna (client side)</td><td>Web browser, mobile app</td></tr>
+        <tr><td>Back-end</td><td>Server, storage, aplikasi di sisi cloud</td><td>AWS EC2, S3</td></tr>
+        <tr><td>Internet/Network</td><td>Penghubung front-end dan back-end</td><td>Internet, VPN, Direct Connect</td></tr>
+        <tr><td>Cloud Provider</td><td>Penyedia infrastruktur cloud</td><td>AWS, Azure, GCP</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚡ Monolith vs Microservices</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Aspek</th><th>Monolith</th><th>Microservices</th></tr>
+        <tr><td>Struktur</td><td>Satu aplikasi besar terintegrasi</td><td>Banyak layanan kecil independen</td></tr>
+        <tr><td>Deploy</td><td>Deploy seluruh aplikasi sekaligus</td><td>Deploy tiap layanan secara mandiri</td></tr>
+        <tr><td>Skalabilitas</td><td>Scale seluruh aplikasi</td><td>Scale hanya bagian yang butuh</td></tr>
+        <tr><td>Kerusakan</td><td>Satu bug bisa runtuhkan semuanya</td><td>Satu service rusak, yang lain tetap jalan</td></tr>
+        <tr><td>Cocok untuk</td><td>Aplikasi kecil/sederhana</td><td>Aplikasi besar, kompleks (Netflix, Gojek)</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔑 Konsep Penting Arsitektur Cloud</div>
+    <div class="hl hl-blue"><strong>Load Balancer:</strong> Mendistribusikan traffic ke beberapa server agar tidak ada server yang overload. Seperti kasir yang mengarahkan antrian ke loket yang kosong.</div>
+    <div class="hl hl-teal"><strong>Auto Scaling:</strong> Sistem otomatis tambah atau kurangi jumlah server berdasarkan beban. Saat banyak pengguna → tambah server. Saat sepi → kurangi server.</div>
+    <div class="hl hl-green"><strong>CDN (Content Delivery Network):</strong> Jaringan server yang tersebar di banyak lokasi geografis untuk menyajikan konten dari server terdekat ke pengguna. Tujuan: kurangi latency.</div>
+    <div class="hl hl-amber"><strong>High Availability:</strong> Sistem dirancang agar tetap beroperasi meski ada komponen yang gagal. Gunakan redundancy (duplikasi komponen penting).</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 5</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w5','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w5','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w5','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w5','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w5"></div>
+  </div>
+</div>
+
+<!-- ====== WEEK 6 ====== -->
+<div id="w6" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 6</div>
+    <h2>Infrastruktur Awan</h2>
+    <p>Komponen fisik dan logis yang membangun layanan cloud</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🔧 Komponen Infrastruktur Cloud <span class="badge badge-blue">Penting</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Komponen</th><th>Fungsi</th><th>Di cloud, setara dengan</th></tr>
+        <tr><td>Server/Compute</td><td>Proses komputasi</td><td>Virtual Machine / Instance</td></tr>
+        <tr><td>Storage</td><td>Simpan data</td><td>Object Storage (S3), Block Storage (EBS)</td></tr>
+        <tr><td>Networking</td><td>Koneksi antar komponen</td><td>VPC, Subnet, Load Balancer</td></tr>
+        <tr><td>Database</td><td>Kelola data terstruktur</td><td>AWS RDS, Cloud SQL, Azure DB</td></tr>
+        <tr><td>Security</td><td>Proteksi sistem</td><td>Firewall, IAM, Encryption</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💾 Jenis Storage Cloud</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Jenis</th><th>Cara Kerja</th><th>Cocok untuk</th><th>Contoh</th></tr>
+        <tr><td><strong>Object Storage</strong></td><td>Data disimpan sebagai objek dengan metadata</td><td>File, gambar, video, backup</td><td>AWS S3, GCS</td></tr>
+        <tr><td><strong>Block Storage</strong></td><td>Data dipecah jadi blok-blok kecil</td><td>Database, OS, aplikasi performa tinggi</td><td>AWS EBS, Azure Disk</td></tr>
+        <tr><td><strong>File Storage</strong></td><td>Hierarki folder seperti file system biasa</td><td>Berbagi file antar VM</td><td>AWS EFS, Azure Files</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌐 Konsep Networking di Cloud</div>
+    <div class="hl hl-blue"><strong>VPC (Virtual Private Cloud):</strong> Jaringan virtual private yang terisolasi di dalam cloud public. Pengguna bisa definisikan IP range, subnet, routing, dan firewall sendiri.</div>
+    <div class="hl hl-teal"><strong>Subnet:</strong> Pembagian jaringan dalam VPC. Public subnet = bisa diakses internet. Private subnet = hanya akses internal.</div>
+    <div class="hl hl-green"><strong>Security Group / Firewall:</strong> Aturan yang mengontrol traffic masuk (inbound) dan keluar (outbound) dari VM/instance.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 6</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w6','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w6','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w6','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w6','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w6"></div>
+  </div>
+</div>
+
+<!-- ====== WEEK 7 ====== -->
+<div id="w7" class="section">
+  <div class="week-header">
+    <div class="week-badge">WEEK 7</div>
+    <h2>Webserver on Cloud</h2>
+    <p>Implementasi dasar: menjalankan web server di infrastruktur cloud</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🌐 Konsep Dasar Web Server di Cloud</div>
+    <div class="hl hl-blue">Web server di cloud berarti menjalankan software web server (seperti Apache atau Nginx) di dalam Virtual Machine yang disewa dari cloud provider (seperti AWS EC2), sehingga website bisa diakses melalui internet.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚀 Alur Deploy Web Server di Cloud</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Langkah</th><th>Tindakan</th><th>Contoh di AWS</th></tr>
+        <tr><td>1</td><td>Buat VM/Instance</td><td>Launch EC2 Instance (pilih OS: Ubuntu)</td></tr>
+        <tr><td>2</td><td>Konfigurasi keamanan</td><td>Security Group: buka port 80 (HTTP) dan 22 (SSH)</td></tr>
+        <tr><td>3</td><td>Koneksi ke VM</td><td>SSH ke instance menggunakan key pair</td></tr>
+        <tr><td>4</td><td>Install web server</td><td>apt install apache2 / nginx</td></tr>
+        <tr><td>5</td><td>Upload konten web</td><td>Copy file HTML ke /var/www/html/</td></tr>
+        <tr><td>6</td><td>Akses via IP publik</td><td>Buka browser → masukkan IP publik EC2</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚙️ Perbandingan Apache vs Nginx</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Aspek</th><th>Apache</th><th>Nginx</th></tr>
+        <tr><td>Model</td><td>Process-based (fork per koneksi)</td><td>Event-driven (asinkron)</td></tr>
+        <tr><td>Performa traffic tinggi</td><td>Kurang efisien</td><td>Lebih efisien</td></tr>
+        <tr><td>Konfigurasi</td><td>Per-direktori (.htaccess)</td><td>Terpusat</td></tr>
+        <tr><td>Umum digunakan</td><td>Web server aplikasi PHP</td><td>Reverse proxy, load balancer, web server statis</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌍 IP Publik vs IP Privat</div>
+    <div class="hl hl-amber"><strong>IP Publik:</strong> Alamat IP yang bisa diakses dari internet. VM di cloud mendapat IP publik agar website bisa diakses pengguna luar.</div>
+    <div class="hl hl-teal"><strong>IP Privat:</strong> Alamat IP internal dalam jaringan VPC. Tidak bisa diakses langsung dari internet. Dipakai untuk komunikasi antar VM di dalam cloud.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Latihan Soal Week 7</div>
+    <div class="quiz-filter">
+      <button class="filter-btn active" onclick="filterQuiz('quiz-w7','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w7','easy',this)">😊 Mudah</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w7','med',this)">😐 Sedang</button>
+      <button class="filter-btn" onclick="filterQuiz('quiz-w7','hard',this)">😤 Sulit</button>
+    </div>
+    <div class="quiz-container" id="quiz-w7"></div>
+  </div>
+</div>
+
+<!-- ====== TIPS ====== -->
+<div id="tips" class="section">
+  <div class="week-header">
+    <div class="week-badge">TIPS UTS</div>
+    <h2>Strategi Menjawab & Tips Belajar</h2>
+    <p>Kesalahan umum, topik sering keluar, dan cara menjawab soal teori</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 Topik Paling Sering Keluar <span class="badge badge-red">Prioritas</span></div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Topik</th><th>Bentuk Soal Tipikal</th><th>Tips</th></tr>
+        <tr><td>IaaS vs PaaS vs SaaS</td><td>Pilih model layanan yang tepat untuk skenario perusahaan</td><td>Fokus pada siapa yang kelola apa</td></tr>
+        <tr><td>5 Prinsip Cloud (NIST)</td><td>Jelaskan dan beri contoh masing-masing prinsip</td><td>Hafal O-B-R-R-M dengan contoh konkret</td></tr>
+        <tr><td>Jenis Deployment</td><td>Pilih jenis cloud yang sesuai kebutuhan</td><td>Ingat: Hybrid = private + public</td></tr>
+        <tr><td>Hypervisor Type 1 vs Type 2</td><td>Perbedaan dan contoh masing-masing</td><td>Type 1 = bare-metal (data center), Type 2 = laptop</td></tr>
+        <tr><td>VM vs Container</td><td>Perbandingan karakteristik</td><td>VM = OS sendiri, Container = berbagi OS host</td></tr>
+        <tr><td>Kelebihan/Kekurangan cloud</td><td>Analisis skenario penerapan</td><td>Selalu kaitkan dengan konteks kasus</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚠️ Kesalahan Umum Mahasiswa</div>
+    <div class="hl hl-red"><strong>❌ Salah bedain IaaS dan PaaS:</strong> Ingat, di PaaS developer tidak urus server sama sekali. Di IaaS masih urus OS.</div>
+    <div class="hl hl-red"><strong>❌ Menganggap serverless = tidak ada server:</strong> Server tetap ada, tapi dikelola provider. Developer hanya tulis kode fungsi.</div>
+    <div class="hl hl-red"><strong>❌ Mengira container = virtual machine:</strong> Container tidak punya OS sendiri, jauh lebih ringan dari VM.</div>
+    <div class="hl hl-red"><strong>❌ Lupa contoh nyata:</strong> Soal UTS sering minta contoh. Hafal minimal 2 contoh per model layanan.</div>
+    <div class="hl hl-red"><strong>❌ Salah definisi Hypervisor:</strong> Hypervisor adalah SOFTWARE yang memungkinkan virtualisasi, bukan hardware.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✏️ Tips Menjawab Soal Teori Cloud Computing</div>
+    <div class="tip-grid">
+      <div class="tip-card"><div class="tip-num">1</div><div class="tip-title">Definisi dulu</div><div class="tip-text">Mulai jawaban dengan definisi konsep yang ditanya. Ini menunjukkan pemahaman dasar.</div></div>
+      <div class="tip-card"><div class="tip-num">2</div><div class="tip-title">Karakteristik</div><div class="tip-text">Sebutkan karakteristik/ciri-ciri utama secara terstruktur (poin-poin).</div></div>
+      <div class="tip-card"><div class="tip-num">3</div><div class="tip-title">Contoh nyata</div><div class="tip-text">Berikan contoh konkret (nama perusahaan/produk). Ini nilai tambah besar.</div></div>
+      <div class="tip-card"><div class="tip-num">4</div><div class="tip-title">Kaitkan manfaat</div><div class="tip-text">Jelaskan kenapa konsep ini penting / apa manfaatnya bagi bisnis atau teknologi.</div></div>
+      <div class="tip-card"><div class="tip-num">5</div><div class="tip-title">Analisis skenario</div><div class="tip-text">Kalau soal analisis: baca skenario, identifikasi kebutuhan, cocokkan dengan konsep yang tepat.</div></div>
+      <div class="tip-card"><div class="tip-num">6</div><div class="tip-title">Hindari hafalan buta</div><div class="tip-text">Pahami konsep, jangan hafal kata per kata. Soal UTS biasanya variasi dari konsep dasar.</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var visited = {};
+var totalSections = ['w1','w2','w3','w4','w5','w6','w7'];
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (totalSections.indexOf(id) >= 0) {
+    visited[id] = true;
+    if (btn) btn.classList.add('done');
+    updateProgress();
+  }
+  window.scrollTo(0, 0);
+}
+
+function updateProgress() {
+  var count = Object.keys(visited).length;
+  var pct = Math.round((count / totalSections.length) * 100);
+  document.getElementById('main-progress').style.width = pct + '%';
+  document.getElementById('main-pct').textContent = pct + '%';
+}
+
+function toggleAnswer(id, btn) {
+  var box = document.getElementById(id);
+  var isShown = box.classList.contains('show');
+  box.classList.toggle('show');
+  btn.textContent = isShown ? '👁 Lihat Jawaban' : '🙈 Sembunyikan';
+  btn.classList.toggle('revealed', !isShown);
+}
+
+function filterQuiz(containerId, diff, btn) {
+  var container = document.getElementById(containerId);
+  var cards = container.querySelectorAll('.quiz-q');
+  cards.forEach(function(c) {
+    if (diff === 'all' || c.dataset.diff === diff) { c.style.display = ''; }
+    else { c.style.display = 'none'; }
+  });
+  var wrap = btn.parentElement;
+  wrap.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+var quizData = {
+  'quiz-w1': [
+    { diff: 'easy', q: '(Mudah) Apa definisi cloud computing menurut NIST?', a: 'Cloud computing adalah model yang memungkinkan akses jaringan yang nyaman dan sesuai permintaan ke kumpulan sumber daya komputasi yang dapat dikonfigurasi (jaringan, server, penyimpanan, aplikasi, dan layanan) yang dapat dengan cepat disediakan dan dirilis dengan upaya manajemen minimal atau interaksi penyedia layanan.' },
+    { diff: 'easy', q: '(Mudah) Sebutkan 5 prinsip cloud computing (NIST)!', a: '1. On-demand self-service: langsung pakai sendiri tanpa hubungi penyedia\n2. Broad network access: bisa diakses dari mana saja lewat internet\n3. Resource pooling: sumber daya dipakai bersama, tapi terisolasi\n4. Rapid elasticity: kapasitas bisa naik-turun cepat\n5. Measured service: bayar hanya sesuai yang dipakai' },
+    { diff: 'easy', q: '(Mudah) Sebutkan 4 jenis deployment cloud dan jelaskan singkat masing-masing!', a: '1. Public Cloud: diakses umum, dikelola provider (AWS, Azure, GCP)\n2. Private Cloud: dikelola satu organisasi saja, lebih aman\n3. Hybrid Cloud: kombinasi public + private\n4. Community Cloud: dipakai bersama oleh sekelompok organisasi dengan kepentingan sama' },
+    { diff: 'med', q: '(Sedang) Jelaskan kelebihan dan kekurangan cloud computing dibandingkan infrastruktur tradisional!', a: 'Kelebihan cloud: (1) Biaya operasional lebih rendah (tidak perlu beli hardware), (2) Skalabilitas tinggi — bisa scale up/down sesuai kebutuhan, (3) Aksesibilitas global — bisa diakses dari mana saja, (4) Tidak perlu maintenance hardware.\n\nKekurangan cloud: (1) Ketergantungan pada koneksi internet, (2) Kekhawatiran keamanan data dan privasi, (3) Vendor lock-in — sulit pindah provider, (4) Biaya bisa membengkak jika tidak dipantau.' },
+    { diff: 'med', q: '(Sedang) Apa perbedaan antara Hybrid Cloud dan Multi-Cloud? Berikan contoh penggunaan masing-masing!', a: 'Hybrid Cloud: kombinasi private cloud + public cloud yang terintegrasi. Contoh: HSBC menyimpan data sensitif nasabah di private cloud, tapi menjalankan analitik di public cloud AWS.\n\nMulti-Cloud: menggunakan lebih dari satu public cloud provider tanpa harus terintegrasi. Contoh: startup pakai AWS untuk hosting, Azure untuk layanan AI, dan GCP untuk analitik data.\n\nPerbedaan kunci: Hybrid = private + public (terintegrasi). Multi-Cloud = beberapa public cloud (bisa terpisah).' },
+    { diff: 'hard', q: '(Sulit) Mengapa model "pay-as-you-go" dianggap salah satu keunggulan utama cloud computing dari perspektif bisnis?', a: 'Pay-as-you-go mengubah pengeluaran IT dari Capital Expenditure (CapEx) menjadi Operational Expenditure (OpEx):\n\n1. CapEx tradisional: beli server mahal di awal (bisa miliaran), meski utilitas rendah\n2. OpEx cloud: bayar hanya saat dipakai, tidak ada investasi awal besar\n\nImplikasi bisnis: (1) Modal awal sangat rendah — startup bisa mulai dengan budget kecil, (2) Tidak ada risiko overcapacity — tidak beli terlalu banyak server yang tidak terpakai, (3) Biaya sesuai pertumbuhan bisnis — bayar lebih saat ramai, hemat saat sepi, (4) Cash flow lebih mudah diprediksi.' }
+  ],
+  'quiz-w2': [
+    { diff: 'easy', q: '(Mudah) Apa kepanjangan dari IaaS, PaaS, dan SaaS?', a: 'IaaS = Infrastructure as a Service\nPaaS = Platform as a Service\nSaaS = Software as a Service' },
+    { diff: 'easy', q: '(Mudah) Berikan 2 contoh nyata untuk masing-masing IaaS, PaaS, dan SaaS!', a: 'IaaS: AWS EC2, Google Compute Engine, Azure Virtual Machines\nPaaS: Google App Engine, Heroku, AWS Elastic Beanstalk\nSaaS: Gmail, Google Docs, Zoom, Dropbox, Microsoft 365' },
+    { diff: 'easy', q: '(Mudah) Pada model SaaS, apa yang dikelola oleh pengguna?', a: 'Pada model SaaS, pengguna tidak mengelola apapun dari sisi infrastruktur atau platform. Pengguna hanya menggunakan aplikasinya saja. Semua aspek teknis (server, OS, middleware, runtime, storage) dikelola sepenuhnya oleh provider.' },
+    { diff: 'med', q: '(Sedang) Sebuah startup ingin membuat aplikasi mobile tanpa pusing urusan server. Model layanan cloud mana yang paling cocok dan mengapa?', a: 'PaaS (Platform as a Service) paling cocok untuk startup ini.\n\nAlasannya: (1) Developer hanya fokus pada kode aplikasi, tidak perlu urus server, OS, atau infrastruktur, (2) Provider mengelola runtime, middleware, OS, dan hardware secara otomatis, (3) Bisa scale otomatis sesuai kebutuhan tanpa konfigurasi manual, (4) Contoh: Heroku, Google App Engine, AWS Elastic Beanstalk.\n\nKesimpulan: PaaS = developer fokus pada logic bisnis, bukan infrastruktur.' },
+    { diff: 'med', q: '(Sedang) Jelaskan analogi "apartemen" untuk menggambarkan perbedaan IaaS, PaaS, dan SaaS!', a: 'Analogi properti untuk memahami model layanan cloud:\n\nIaaS = Sewa tanah kosong: Kamu dapat tanah (infrastruktur), tapi harus bangun rumah sendiri, pasang listrik sendiri, cat sendiri.\n\nPaaS = Sewa rumah dengan dinding & atap: Bangunan sudah ada (platform), tapi kamu isi sendiri perabotnya (aplikasi dan data).\n\nSaaS = Sewa apartemen furnished: Langsung bisa tinggal. Semua sudah tersedia — tinggal pakai saja.' },
+    { diff: 'hard', q: '(Sulit) Kapan sebaiknya perusahaan memilih IaaS dibandingkan PaaS, dan apa risikonya?', a: 'Pilih IaaS ketika: (1) Butuh kontrol penuh atas OS dan konfigurasi sistem, (2) Aplikasi legacy yang tidak kompatibel dengan platform PaaS, (3) Tim IT yang besar dan berpengalaman tersedia, (4) Compliance/regulasi yang membutuhkan konfigurasi keamanan khusus.\n\nRisiko IaaS: (1) Tanggung jawab lebih besar — tim harus urus OS, patching, security, (2) Butuh keahlian teknis tinggi (DevOps, SysAdmin), (3) Risiko misconfiguration lebih tinggi, (4) Total cost bisa lebih tinggi jika tidak dioptimalkan.' },
+    { diff: 'hard', q: '(Sulit) Jelaskan shared responsibility model dalam cloud computing dan bagaimana berbeda di IaaS vs SaaS!', a: 'Shared Responsibility Model = pembagian tanggung jawab keamanan antara provider dan pengguna.\n\nDi IaaS:\n- Provider bertanggung jawab: keamanan fisik data center, hypervisor, jaringan fisik\n- User bertanggung jawab: OS (patching, hardening), aplikasi, data, firewall setting, identity management\n\nDi SaaS:\n- Provider bertanggung jawab: hampir semuanya (infrastruktur, platform, aplikasi, keamanan aplikasi)\n- User bertanggung jawab: data yang dimasukkan, manajemen akun pengguna, konfigurasi akses\n\nKesimpulan: Semakin tinggi model (IaaS→PaaS→SaaS), semakin kecil tanggung jawab keamanan pengguna.' }
+  ],
+  'quiz-w3': [
+    { diff: 'easy', q: '(Mudah) Apa yang dimaksud dengan Edge Computing?', a: 'Edge Computing adalah paradigma komputasi di mana pemrosesan data dilakukan di dekat sumber data (di "tepi" jaringan), bukan di pusat data yang jauh. Tujuannya adalah mengurangi latency dan bandwidth yang digunakan dengan memproses data secara lokal sebelum mengirim hasilnya ke cloud.' },
+    { diff: 'easy', q: '(Mudah) Apa perbedaan antara Multi-Cloud dan Hybrid Cloud?', a: 'Multi-Cloud: menggunakan lebih dari satu public cloud provider (misal AWS + Azure + GCP). Tidak harus terintegrasi.\n\nHybrid Cloud: kombinasi private cloud + public cloud yang TERINTEGRASI, data bisa berpindah antara keduanya. Contoh: data sensitif di private, analitik di public.' },
+    { diff: 'med', q: '(Sedang) Jelaskan konsep Serverless Computing dan bedakan dengan server tradisional!', a: 'Serverless Computing: model komputasi di mana developer menulis dan men-deploy kode (biasanya dalam bentuk fungsi/function) tanpa perlu memikirkan pengelolaan server. Server tetap ada, tapi dikelola sepenuhnya oleh provider.\n\nPerbedaan dengan server tradisional:\n1. Server tradisional: selalu berjalan 24/7, bayar terus meski tidak ada request\n2. Serverless: hanya berjalan saat ada request, bayar per eksekusi fungsi\n3. Serverless: auto-scale otomatis, tidak perlu konfigurasi\n\nContoh: AWS Lambda, Google Cloud Functions.' },
+    { diff: 'hard', q: '(Sulit) Jelaskan kelebihan dan keterbatasan Serverless Computing untuk pengembangan sistem informasi modern!', a: 'Kelebihan: (1) Tidak perlu kelola server, (2) Biaya efisien — bayar per eksekusi fungsi, (3) Auto-scale otomatis, (4) Developer fokus pada logika bisnis.\n\nKeterbatasan: (1) Cold start — fungsi yang jarang dipanggil perlu "pemanasan" yang menambah latensi pertama, (2) Durasi eksekusi terbatas (misal AWS Lambda max 15 menit), (3) Sulit debug dan monitoring, (4) Vendor lock-in kuat (AWS Lambda tidak mudah dipindah ke GCP).' },
+    { diff: 'hard', q: '(Sulit) Mengapa Green Cloud Computing menjadi semakin penting? Apa saja langkah nyata yang dilakukan provider?', a: 'Pentingnya: Data center mengkonsumsi ~1-2% listrik global dan terus bertumbuh. Tanpa efisiensi, emisi karbon IT akan meningkat drastis.\n\nLangkah nyata provider: (1) Google: AI DeepMind kurangi energi pendingin 40%, (2) Microsoft: berkomitmen carbon negative 2030, bangun data center bawah laut, (3) AWS: 100% renewable energy target, (4) Lokasi data center di daerah dingin (Islandia) untuk free cooling, (5) Efisiensi hardware — chip yang lebih hemat energi (ARM-based).' }
+  ],
+  'quiz-w4': [
+    { diff: 'easy', q: '(Mudah) Apa itu virtualisasi dalam konteks computing?', a: 'Virtualisasi adalah teknologi yang memungkinkan satu perangkat keras fisik dibagi menjadi beberapa unit komputasi virtual (Virtual Machine) yang terisolasi satu sama lain, menggunakan software yang disebut Hypervisor.' },
+    { diff: 'easy', q: '(Mudah) Apa perbedaan antara Hypervisor Type 1 dan Type 2?', a: 'Type 1 (Bare-metal): Langsung di atas hardware fisik, tanpa OS host. Performa lebih baik. Dipakai di data center. Contoh: VMware ESXi, Hyper-V.\n\nType 2 (Hosted): Diinstall di atas OS host seperti aplikasi biasa. Lebih mudah diinstall. Untuk personal/dev. Contoh: VirtualBox, VMware Workstation.' },
+    { diff: 'easy', q: '(Mudah) Sebutkan 3 manfaat utama virtualisasi bagi cloud computing!', a: '1. Resource pooling — satu server fisik bisa melayani banyak pelanggan via beberapa VM\n2. Efisiensi biaya — tidak perlu beli banyak server fisik\n3. Elastisitas — VM bisa dibuat atau dihapus dalam hitungan menit' },
+    { diff: 'med', q: '(Sedang) Jelaskan perbedaan antara Virtual Machine (VM) dan Container!', a: 'VM: Setiap VM punya OS sendiri (Guest OS) di atas Hypervisor. Ukuran besar (GB), startup lambat (menit), isolasi sangat kuat.\n\nContainer (Docker): Berbagi kernel OS host, hanya virtualisasi di level proses/aplikasi. Ukuran kecil (MB), startup sangat cepat (detik), lebih efisien resource.\n\nAnalogi: VM = apartemen dengan dapur sendiri. Container = kost-kostan yang berbagi dapur bersama.' },
+    { diff: 'med', q: '(Sedang) Jelaskan konsep "Server Consolidation" menggunakan virtualisasi dan manfaatnya!', a: 'Server Consolidation = menggabungkan banyak server fisik yang utilitas rendah menjadi beberapa VM di server fisik yang lebih sedikit.\n\nManfaat: (1) Penghematan biaya hardware yang signifikan, (2) Konsumsi listrik dan ruang data center berkurang, (3) Maintenance lebih mudah (lebih sedikit perangkat fisik), (4) Utilisasi server meningkat (dari rata-rata 15% ke 70-80%).' },
+    { diff: 'hard', q: '(Sulit) Jelaskan cara kerja Hypervisor dalam mengelola resource CPU, memory, dan storage untuk beberapa VM!', a: 'CPU: Hypervisor membagi waktu CPU (CPU scheduling) antar VM. Setiap VM pikir punya CPU sendiri, padahal hypervisor menjadwalkan giliran akses ke CPU fisik.\n\nMemory: Hypervisor mengalokasikan blok RAM fisik ke tiap VM. Teknik seperti memory balloon dan deduplication digunakan untuk efisiensi.\n\nStorage: Hypervisor memetakan virtual disk (file .vmdk/.vdi) ke storage fisik. VM hanya tahu disk virtual mereka, tidak tahu lokasi fisik sesungguhnya.\n\nKunci: semua ini dengan isolasi ketat — satu VM tidak bisa akses resource VM lain.' },
+    { diff: 'hard', q: '(Sulit) Apa itu "Live Migration" dan mengapa ini penting untuk cloud computing?', a: 'Live Migration = proses memindahkan VM yang sedang berjalan dari satu server fisik ke server fisik lain TANPA mematikan VM atau memutus layanan (downtime minimal/nol).\n\nPentingnya untuk cloud: (1) Maintenance server fisik tanpa ganggu pengguna, (2) Load balancing — pindahkan VM dari server sibuk ke yang lebih kosong, (3) Disaster recovery — pindahkan VM dari server yang akan gagal, (4) Efisiensi energi — konsolidasi VM di malam hari, matikan server yang kosong.' }
+  ],
+  'quiz-w5': [
+    { diff: 'easy', q: '(Mudah) Sebutkan 4 komponen utama dalam arsitektur cloud computing!', a: 'Komponen utama arsitektur cloud: (1) Front-end (antarmuka pengguna: browser, app), (2) Back-end (server, storage, aplikasi di cloud), (3) Internet/Jaringan (penghubung front-end dan back-end), (4) Cloud Provider (penyedia infrastruktur: AWS, Azure, GCP).' },
+    { diff: 'easy', q: '(Mudah) Apa fungsi Load Balancer dalam arsitektur cloud?', a: 'Load Balancer mendistribusikan traffic/permintaan pengguna ke beberapa server secara merata, sehingga tidak ada satu server pun yang overload. Meningkatkan ketersediaan (availability) dan performa sistem.' },
+    { diff: 'med', q: '(Sedang) Jelaskan perbedaan arsitektur Monolith dan Microservices beserta kelebihan/kekurangannya!', a: 'Monolith: Semua fungsi dalam satu aplikasi besar. Mudah dikembangkan di awal, tapi sulit di-scale dan satu bug bisa runtuhkan semuanya.\n\nMicroservices: Aplikasi dipecah jadi layanan-layanan kecil independen. Lebih scalable, resilient, dan mudah di-deploy terpisah, tapi lebih kompleks untuk dikelola. Contoh microservices: Netflix, Gojek.' },
+    { diff: 'med', q: '(Sedang) Apa itu CDN (Content Delivery Network) dan bagaimana cara kerjanya?', a: 'CDN adalah jaringan server yang tersebar di banyak lokasi geografis, menyimpan cache konten statis (gambar, video, HTML). Saat pengguna mengakses konten, CDN menyajikannya dari server terdekat secara geografis.\n\nManfaat: (1) Kurangi latency, (2) Kurangi beban server utama, (3) Meningkatkan ketersediaan. Contoh: Cloudflare, AWS CloudFront.' },
+    { diff: 'hard', q: '(Sulit) Jelaskan konsep "High Availability" dan "Fault Tolerance" dalam arsitektur cloud. Apa bedanya?', a: 'High Availability (HA): Sistem dirancang untuk tetap beroperasi dengan downtime minimal. Biasanya diukur dalam "nines" (99.9% = 8.7 jam downtime/tahun). Dicapai dengan redundancy dan failover otomatis.\n\nFault Tolerance: Sistem tetap beroperasi TANPA gangguan apapun meski ada komponen yang gagal. Lebih strict dari HA — tidak ada downtime sama sekali. Biasanya butuh infrastruktur duplikat penuh yang lebih mahal.\n\nBeda: HA boleh ada downtime singkat saat failover, Fault Tolerance tidak boleh ada downtime sama sekali.' }
+  ],
+  'quiz-w6': [
+    { diff: 'easy', q: '(Mudah) Sebutkan 3 jenis storage yang tersedia di cloud dan jelaskan singkat perbedaannya!', a: 'Object Storage: Data disimpan sebagai objek dengan metadata. Cocok untuk file, gambar, video. Contoh: AWS S3.\n\nBlock Storage: Data dipecah jadi blok. Performa tinggi. Cocok untuk database dan OS. Contoh: AWS EBS.\n\nFile Storage: Hierarki folder. Cocok untuk berbagi file antar VM. Contoh: AWS EFS.' },
+    { diff: 'easy', q: '(Mudah) Apa itu VPC (Virtual Private Cloud)?', a: 'VPC adalah jaringan virtual private yang terisolasi di dalam infrastruktur cloud public. Pengguna bisa mendefinisikan IP range, subnet, routing, firewall, dan konfigurasi jaringan sesuai kebutuhan, mirip memiliki jaringan privat sendiri meskipun berada di cloud publik.' },
+    { diff: 'med', q: '(Sedang) Apa perbedaan antara public subnet dan private subnet dalam VPC?', a: 'Public Subnet: Terhubung ke internet melalui Internet Gateway. Resource di sini bisa diakses dari internet. Cocok untuk web server, load balancer.\n\nPrivate Subnet: Tidak terhubung langsung ke internet. Resource hanya bisa diakses dari dalam jaringan internal. Cocok untuk database, backend server.' },
+    { diff: 'hard', q: '(Sulit) Jelaskan konsep "Infrastructure as Code" (IaC) dan keuntungannya dalam pengelolaan infrastruktur cloud!', a: 'IaC = pendekatan mengelola dan memprovisi infrastruktur cloud menggunakan file konfigurasi/kode (bukan klik-klik manual di console).\n\nKeuntungan: (1) Version control — infrastruktur bisa di-track perubahan seperti kode, (2) Reproducible — buat infrastruktur identik di environment berbeda, (3) Automasi — deploy konsisten tanpa human error, (4) Efisiensi — buat/hapus infrastruktur dalam menit. Contoh tools: Terraform, AWS CloudFormation, Ansible.' }
+  ],
+  'quiz-w7': [
+    { diff: 'easy', q: '(Mudah) Apa perbedaan antara IP Publik dan IP Privat pada VM cloud?', a: 'IP Publik: Alamat yang bisa diakses dari internet. Digunakan agar website/service bisa diakses pengguna luar.\n\nIP Privat: Alamat internal dalam jaringan VPC. Tidak bisa diakses langsung dari internet. Digunakan untuk komunikasi antar VM dalam cloud.' },
+    { diff: 'med', q: '(Sedang) Mengapa harus membuka port 80 (HTTP) di Security Group saat deploy web server di cloud?', a: 'Port 80 adalah port standar protokol HTTP. Secara default, cloud provider memblokir semua traffic masuk (inbound). Untuk web server bisa diakses dari browser pengguna melalui internet, port 80 harus dibuka di Security Group/Firewall sehingga traffic HTTP dapat masuk ke VM.' },
+    { diff: 'hard', q: '(Sulit) Jelaskan perbedaan arsitektur Apache dan Nginx serta kapan sebaiknya masing-masing digunakan!', a: 'Apache: Model process/thread-based — membuat proses/thread baru untuk tiap koneksi. Cocok untuk aplikasi yang butuh konfigurasi per-direktori (.htaccess), banyak modul PHP. Performa menurun di traffic sangat tinggi.\n\nNginx: Event-driven, asinkron — satu proses bisa handle banyak koneksi sekaligus. Sangat efisien untuk traffic tinggi dan konten statis. Sering dipakai sebagai reverse proxy dan load balancer.\n\nPilihan: Nginx lebih modern dan efisien untuk web server high-traffic. Apache masih banyak dipakai untuk compatibility dengan PHP stack lama.' }
+  ]
+};
+
+var answerState = {};
+
+function renderQuiz(containerId, questions) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var html = '';
+  questions.forEach(function(q, i) {
+    var diffClass = q.diff === 'easy' ? 'diff-easy' : (q.diff === 'med' ? 'diff-med' : 'diff-hard');
+    var diffLabel = q.diff === 'easy' ? 'Mudah' : (q.diff === 'med' ? 'Sedang' : 'Sulit');
+    var answerId = containerId + '-ans-' + i;
+    var btnId = containerId + '-btn-' + i;
+    html += '<div class="quiz-q" data-diff="' + q.diff + '">';
+    html += '<div class="q-meta"><span class="q-num">Soal ' + (i+1) + ' / ' + questions.length + '</span><span class="' + diffClass + '">' + diffLabel + '</span></div>';
+    html += '<div class="q-text">' + q.q.replace(/\n/g, '<br>') + '</div>';
+    html += '<div class="btn-row">';
+    html += '<button class="ans-btn" id="' + btnId + '" onclick="toggleAnswer(\'' + answerId + '\', this)">👁 Lihat Jawaban</button>';
+    html += '</div>';
+    html += '<div class="answer-box" id="' + answerId + '">' + q.a.replace(/\n/g, '<br>') + '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+Object.keys(quizData).forEach(function(key) { renderQuiz(key, quizData[key]); });
+</script>
+</body>
+</html>
